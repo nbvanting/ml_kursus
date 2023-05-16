@@ -3,7 +3,7 @@ name = "lighthouse-course"
 version = "0.1.0"
 description = "Code and Notebooks for the Lighthouse Project course on Machine Learning for Demand Forecast."
 authors = ["nva <nva@mmmi.sdu.dk>"]
-license = "MIT"
+license = "European Union Public Licence v. 1.2"
 readme = "README.md"
 packages = [{include = "src"}]
 
