@@ -1,33 +1,42 @@
-import pandas as pd
-from time import time
 import multiprocessing as mp
+from time import time
 
-# Scikit-Learn
-from sklearn.preprocessing import MinMaxScaler, RobustScaler
-from sklearn.model_selection import train_test_split
+import pandas as pd
 
 # PyTorch
 import torch
+from sklearn.model_selection import train_test_split
+
+# Scikit-Learn
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
 from torch.nn import functional as F
-from torch.utils.data import TensorDataset, DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 
+from src.prepare_data import TSDataset
 
+features = pd.read_csv(
+    "data/electricity_load_data.csv",
+    index_col=["datetime"],
+    parse_dates=True,
+    infer_datetime_format=True,
+)
 
-features = pd.read_csv('data/feature_data.csv', index_col=['datetime'], parse_dates=True, infer_datetime_format=True)
-
-# Pop the target variable out of the dataframe
-y = features.pop('load')
-# The lagged features remain
-X = features.copy()
+# Generate target and input variables
+dataset = TSDataset(dataframe=features, target_variable="load")
+X, y = dataset.to_supervised(n_lags=23, horizon=1)
 
 test_ratio = 0.2
-val_ratio = test_ratio / (1-test_ratio)
+val_ratio = test_ratio / (1 - test_ratio)
 
 # Split set once for test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_ratio, shuffle=False)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=test_ratio, shuffle=False
+)
 
 # Split once more for validation
-X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=val_ratio, shuffle=False)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_train, y_train, test_size=val_ratio, shuffle=False
+)
 
 # Reshape to 2D
 y_train = y_train.values.reshape(-1, 1)
@@ -62,9 +71,15 @@ val_ds = TensorDataset(val_features, val_targets)
 test_ds = TensorDataset(test_features, test_targets)
 
 
-if __name__ == '__main__':
-    for num_workers in range(2, mp.cpu_count(), 2):  
-        train_loader = DataLoader(train_ds,shuffle=True,num_workers=num_workers,batch_size=64,pin_memory=True)
+if __name__ == "__main__":
+    for num_workers in range(2, mp.cpu_count() + 1, 2):
+        train_loader = DataLoader(
+            train_ds,
+            shuffle=True,
+            num_workers=num_workers,
+            batch_size=64,
+            pin_memory=True,
+        )
         start = time()
         for epoch in range(1, 3):
             for i, data in enumerate(train_loader, 0):
