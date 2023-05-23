@@ -16,7 +16,7 @@ ScalerType = Union[MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler]
 
 def main() -> None:
     load_data = pd.read_csv(
-        "data/load_data.csv", index_col=["datetime"], parse_dates=True
+        "data/electricity_load_data.csv", index_col=["datetime"], parse_dates=True
     )
     # Generate target and input variables
     dataset = TSDataset(dataframe=load_data, target_variable="load")

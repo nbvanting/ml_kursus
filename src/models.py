@@ -37,7 +37,7 @@ class FullyConnectedNetwork(nn.Module):
             else:
                 pass
 
-        self.input_size = input_size  # required for forward pass
+        self.input_size = input_size
         self.activation = get_activation(self.args["activation_fnc"])
         self.flatten = nn.Flatten()
         self.input_layer = nn.Sequential(
