@@ -72,7 +72,7 @@ test_ds = TensorDataset(test_features, test_targets)
 
 
 if __name__ == "__main__":
-    for num_workers in range(2, mp.cpu_count() + 1, 2):
+    for num_workers in range(0, mp.cpu_count() + 1, 2):
         train_loader = DataLoader(
             train_ds,
             shuffle=True,
