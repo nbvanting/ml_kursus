@@ -5,6 +5,7 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import wandb
 from pytorch_lightning import LightningModule
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import (
@@ -120,8 +121,9 @@ class TrainingLoop(LightningModule):
         batch_size: int,
         optimizer: str,
         accelerator: str,
-        train_shuffle: bool,
+        train_shuffle: bool = True,
         num_dl_workers: int = 0,
+        track_wandb: bool = False,
     ):
         super().__init__()
 
@@ -136,6 +138,7 @@ class TrainingLoop(LightningModule):
         self.accelerator = accelerator
         self.train_shuffle = train_shuffle
         self.num_dl_workers = num_dl_workers
+        self.track_wandb = track_wandb
 
         # Predictions
         self.predictions: List[float] = []
@@ -148,12 +151,12 @@ class TrainingLoop(LightningModule):
         x, y = batch
         x = x.view([x.size(0), -1, self.model.input_size]).to(self.accelerator)
         y = y.to(self.accelerator)
-        # Predict
         y_hat = self(x)
-
-        # Compute loss
         loss = F.mse_loss(y_hat, y)
-        return loss
+        mae = F.l1_loss(y_hat, y)
+        if self.track_wandb:
+            wandb.log({"train_loss": loss, "train_mae": mae})
+        return {"loss": loss, "log": {"train_loss": loss}}
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
@@ -161,7 +164,11 @@ class TrainingLoop(LightningModule):
         y = y.to(self.accelerator)
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
-        return loss
+        mae = F.l1_loss(y_hat, y)
+        self.log("val_loss", loss)
+        if self.track_wandb:
+            wandb.log({"val_loss": loss, "val_mae": mae})
+        return {"val_loss": loss, "log": {"val_loss": loss}}
 
     def test_step(self, batch, batch_idx):
         x, y = batch
@@ -169,11 +176,21 @@ class TrainingLoop(LightningModule):
         y = y.to(self.accelerator)
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
-
+        mae = F.l1_loss(y_hat, y)
+        if self.track_wandb:
+            wandb.log({"test_loss": loss, "test_mae": mae})
         self.predictions.append(y_hat)
         self.values.append(y)
+        return {"test_loss": loss, "log": {"test_loss": loss}}
 
-        return loss
+    def validation_epoch_end(self, outputs):
+        val_loss_mean = sum([o["val_loss"] for o in outputs]) / len(outputs)
+
+        results = {
+            "progress_bar": {"val_loss": val_loss_mean.item()},
+            "log": {"val_loss": val_loss_mean.item()},
+        }
+        return results
 
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters(), lr=self.learning_rate)  # type: ignore

@@ -1,0 +1,15 @@
+# Configuration defaults file
+---
+epochs: 20
+output_size: 24
+batch_size: 32
+model: 'lstm'
+hidden_size: 64
+num_rnn_layers: 2
+num_fcn_layers: 2
+dropout: 0.0
+gradient_clip_val: 0.0
+train_dl_shuffle: True
+activation_fnc: 'relu'
+lr: 0.001
+optimizer: 'adam'

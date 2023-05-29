@@ -93,7 +93,7 @@ class LongShortTermMemory(nn.Module):
             else:
                 pass
 
-        self.input_size = input_size  # required for forward pass
+        self.input_size = input_size 
         self.device = device
         self.lstm_layers = nn.LSTM(
             input_size=input_size,
@@ -178,3 +178,25 @@ class GatedRecurrentUnit(nn.Module):
         out, _ = self.gru(x, h_0)
         out = self.output_layer(out[:, -1, :])
         return out
+
+
+ModelType = Union[
+    Type[LongShortTermMemory],
+    Type[GatedRecurrentUnit],
+    Type[FullyConnectedNetwork],
+]
+
+
+def get_model(model: str) -> ModelType:
+    """Function to select a model architecture based on a string
+    Accepts the acronyms of the model name -> ['GRU', 'LSTM', 'FCN']
+    """
+    models = {
+        "gru": GatedRecurrentUnit,
+        "lstm": LongShortTermMemory,
+        "fcn": FullyConnectedNetwork,
+    }
+    try:
+        return models[model.lower()]
+    except KeyError as exc:
+        raise ValueError(f"Model (acronym) '{model}' not found. Try again.") from exc
