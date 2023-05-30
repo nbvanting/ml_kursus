@@ -1,0 +1,59 @@
+# Random Hyperparameter Sweep
+---
+name: random_sweep
+method: random
+metric:
+  name: val_loss
+  goal: minimize
+parameters:
+  epochs:
+    value: 20
+  output_size:
+    value: 24
+  batch_size:
+    values: [32, 64, 128, 256]
+  model:
+    values: ["gru", "fcn", "lstm"]
+  hidden_size:
+    values: [64, 128, 256, 512, 1024]
+  num_rnn_layers:
+    values: [2, 3, 4]
+  num_fcn_layers:
+    values: [2, 3, 4]
+  dropout:
+    values: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+  gradient_clip_val:
+    values: [0.0, 0.1, 0.2]
+  train_dl_shuffle:
+    value: True
+  activation_fnc:
+    values: [
+      "elu",
+      "hardshrink",
+      "hardswish",
+      "leakyrelu",
+      "prelu",
+      "relu",
+      "rrelu",
+      "selu",
+      "celu",
+      "gelu",
+      "silu",
+      "mish"]
+  lr:
+    values: [0.01, 0.001]
+  optimizer:
+    values: [
+      "adadelta",
+      "adagrad",
+      "adam",
+      "adamw",
+      "adamax",
+      "asgd",
+      "lbfgs",
+      "nadam",
+      "radam",
+      "rmsprop",
+      "rprop",
+      "sgd"]
+  
