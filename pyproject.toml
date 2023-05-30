@@ -20,6 +20,7 @@ torch = "^1.13.1"
 pytorch-lightning = "^1.9.4"
 shap = "^0.41.0"
 numba = "^0.56.4"
+wandb = "^0.15.3"
 
 
 [tool.poetry.group.dev.dependencies]
