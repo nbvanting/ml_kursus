@@ -5,7 +5,6 @@ import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import wandb
 from pytorch_lightning import LightningModule
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import (
@@ -17,6 +16,8 @@ from sklearn.preprocessing import (
 from torch import Tensor
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, TensorDataset
+
+import wandb
 
 ScalerType = Union[MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler]
 ActivationType = Union[
@@ -126,6 +127,7 @@ class TrainingLoop(LightningModule):
         track_wandb: bool = False,
     ):
         super().__init__()
+        self.save_hyperparameters(ignore=["model"])
 
         # Model
         self.model = model

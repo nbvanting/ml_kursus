@@ -1,0 +1,93 @@
+import pickle
+
+import click
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import torch
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.multioutput import MultiOutputRegressor
+from torch.utils.data import DataLoader
+
+# From src
+from src.inference import calculate_metrics
+
+# Horizon (24 hours)
+H = 24
+TARGET_COLS = [f"load_t+{h}" for h in range(1, H + 1)]
+TEST_INDEX = pd.date_range("2021-09-11 14:00:00", "2022-05-14 23:00:00", freq="h")
+
+seed = 65
+np.random.seed(seed)
+RNG = np.random.RandomState(seed)
+
+
+@click.command()
+@click.option(
+    "--max_depth",
+    default=6,
+    type=click.INT,
+    help="Max depth of trees for the Random Forest",
+)
+@click.option(
+    "--n_estimators",
+    default=100,
+    type=click.INT,
+    help="Number of estimators to train in the ensemble.",
+)
+@click.option(
+    "--show_plot",
+    default=True,
+    type=click.BOOL,
+    help="Whether to show a plot of the predictions.",
+)
+def main(max_depth: int, n_estimators: int, show_plot: bool):
+    # Convert TensorDatasets back to numpy for the ML algorithms
+    train = torch.load("data/train.pt")
+    train_loader = DataLoader(train, batch_size=len(train))
+    X_train = next(iter(train_loader))[0].numpy()
+    y_train = next(iter(train_loader))[1].numpy()
+
+    val = torch.load("data/val.pt")
+    val_loader = DataLoader(val, batch_size=len(val))
+    X_val = next(iter(val_loader))[0].numpy()
+    y_val = next(iter(val_loader))[1].numpy()
+
+    test = torch.load("data/test.pt")
+    test_loader = DataLoader(test, batch_size=len(test))
+    X_test = next(iter(test_loader))[0].numpy()
+    y_test = next(iter(test_loader))[1].numpy()
+
+    scaler = pickle.load(open("data/scaler.pkl", "rb"))
+
+    rf_reg = MultiOutputRegressor(
+        RandomForestRegressor(
+            n_estimators=n_estimators, max_depth=max_depth, random_state=RNG, verbose=1
+        )
+    )
+    rf_reg.fit(X_train, y_train)
+    y_pred = rf_reg.predict(X_test)
+
+    predictions = scaler.inverse_transform(y_pred)
+    labels = scaler.inverse_transform(y_test)
+
+    df_pred = pd.DataFrame(predictions, columns=TARGET_COLS, index=TEST_INDEX)
+    df_true = pd.DataFrame(labels, columns=TARGET_COLS, index=TEST_INDEX)
+
+    calculate_metrics(df_true, df_pred)
+
+    if show_plot:
+        plt.figure(figsize=(18, 10))
+        plt.plot(df_pred.iloc[0], label="Prediction")
+        plt.plot(df_true.iloc[0], label="True")
+        plt.legend(fontsize=16)
+        plt.xticks(rotation=45)
+        plt.title(
+            f"Forecast for first 24 hours - MultiOutput Random Forest Regressor {df_true.index[0]}",
+            fontsize=18,
+        )
+        plt.show()
+
+
+if __name__ == "__main__":
+    main()
