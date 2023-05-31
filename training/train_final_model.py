@@ -6,12 +6,9 @@ import pytorch_lightning as pl
 import torch
 import yaml
 from pytorch_lightning.callbacks import ModelCheckpoint
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_absolute_percentage_error,
-    mean_squared_error,
-    r2_score,
-)
+from sklearn.metrics import (mean_absolute_error,
+                             mean_absolute_percentage_error,
+                             mean_squared_error, r2_score)
 from torch.utils.data import ConcatDataset
 
 import wandb

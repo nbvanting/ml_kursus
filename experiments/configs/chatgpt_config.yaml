@@ -1,0 +1,26 @@
+name: time_series_forecasting
+method: grid
+metric:
+  name: val_loss
+  goal: minimize
+parameters:
+  epochs:
+    value: 50
+  output_size:
+    value: 24
+  batch_size:
+    value: 32
+  model:
+    values: ["gru", "lstm"]
+  hidden_size:
+    value: 128
+  num_rnn_layers:
+    value: 2
+  dropout:
+    value: 0.2
+  learning_rate:
+    value: 0.001
+  optimizer:
+    values: ["adam", "rmsprop"]
+  train_dl_shuffle:
+    value: True

@@ -3,21 +3,15 @@ import pickle
 import click
 import numpy as np
 import pandas as pd
-
 # PyTorch Lightning
 import pytorch_lightning as pl
-
 # PyTorch
 import torch
 from pytorch_lightning.callbacks import EarlyStopping
-
 # Scikit-Learn
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_absolute_percentage_error,
-    mean_squared_error,
-    r2_score,
-)
+from sklearn.metrics import (mean_absolute_error,
+                             mean_absolute_percentage_error,
+                             mean_squared_error, r2_score)
 
 # From src
 from src.model_training import TrainingLoop
@@ -77,6 +71,8 @@ def main(patience: int, epochs: int):
         dropout=dropout_prob,
         device=DEVICE,
     )
+    
+    # model.to('cuda')
 
     train_loop = TrainingLoop(
         model=model,
@@ -89,7 +85,7 @@ def main(patience: int, epochs: int):
         num_dl_workers=2,
     )
 
-    early_stop = EarlyStopping(monitor="val_loss", patience=patience)
+    early_stop = EarlyStopping(monitor="val_loss", patience=patience, verbose=1)
 
     trainer = pl.Trainer(
         accelerator=DEVICE,

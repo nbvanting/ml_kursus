@@ -2,10 +2,8 @@ import pickle
 
 import numpy as np
 import pandas as pd
-
 # PyTorch Lightning
 import pytorch_lightning as pl
-
 # PyTorch
 import torch
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
@@ -87,7 +85,7 @@ def main():
         accelerator=DEVICE,
         devices=1,
         min_epochs=1,
-        max_epochs=20,
+        max_epochs=5,
         gradient_clip_val=0,
         check_val_every_n_epoch=1,
         val_check_interval=1.0,

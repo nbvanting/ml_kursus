@@ -1,0 +1,35 @@
+# Final model config
+---
+name: final_model
+method: grid
+metric:
+  name: val_loss
+  goal: minimize
+parameters:
+  epochs:
+    value: 20
+  output_size:
+    value: 24
+  batch_size:
+    value: 32
+  model:
+    value: "fcn"
+  hidden_size:
+    value: 256
+  num_rnn_layers:
+    value: 3
+  num_fcn_layers:
+    value: 4
+  dropout:
+    value: 0.1
+  gradient_clip_val:
+    value: 0.2
+  train_dl_shuffle:
+    value: True
+  activation_fnc:
+    value: "elu"
+  lr:
+    value: 0.01
+  optimizer:
+    value: "radam"
+  

@@ -2,21 +2,15 @@ import pickle
 
 import numpy as np
 import pandas as pd
-
 # PyTorch Lightning
 import pytorch_lightning as pl
-
 # PyTorch
 import torch
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
-
 # Scikit-Learn
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_absolute_percentage_error,
-    mean_squared_error,
-    r2_score,
-)
+from sklearn.metrics import (mean_absolute_error,
+                             mean_absolute_percentage_error,
+                             mean_squared_error, r2_score)
 
 # From src
 from src.model_training import TrainingLoop
@@ -51,8 +45,7 @@ def inference(predictions, values):
 
 
 def main():
-    best_training_path = "models/model-name-epoch=06-val_loss=0.49.ckpt"
-
+    best_training_path = "models/model-name-epoch=00-val_loss=0.51.ckpt"
     train_loop = TrainingLoop.load_from_checkpoint(best_training_path)
 
     early_stop = EarlyStopping(monitor="val_loss", patience=1)

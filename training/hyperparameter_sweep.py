@@ -4,16 +4,13 @@ import click
 import numpy as np
 import pytorch_lightning as pl
 import torch
+import wandb
 import yaml
 from pytorch_lightning.callbacks import EarlyStopping
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_absolute_percentage_error,
-    mean_squared_error,
-    r2_score,
-)
+from sklearn.metrics import (mean_absolute_error,
+                             mean_absolute_percentage_error,
+                             mean_squared_error, r2_score)
 
-import wandb
 from src.model_training import TrainingLoop
 from src.models import get_model
 

@@ -11,11 +11,11 @@ parameters:
   output_size:
     value: 24
   batch_size:
-    values: [32, 64, 128, 256]
+    values: [32, 64]
   model:
     values: ["gru", "fcn", "lstm"]
   hidden_size:
-    values: [64, 128, 256, 512, 1024]
+    values: [64, 128, 256]
   num_rnn_layers:
     values: [2, 3, 4]
   num_fcn_layers:

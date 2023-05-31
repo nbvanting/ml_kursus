@@ -1,7 +1,7 @@
 # WandB + Lightning
 lightning_logs/
 wandb/
-models/y
+models/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
